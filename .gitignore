@@ -1,0 +1,25 @@
+# Upstream clone - has its own git history, clone separately (see README)
+/nfi_repo/
+
+# Python env / caches
+.venv/
+__pycache__/
+*.pyc
+
+# Large local-only data & artifacts - not needed to review the strategy/code,
+# regenerate via scripts/ if you clone this
+/user_data/data/
+/user_data/backtest_results/
+/user_data/freqaimodels/
+/user_data/hyperopt_results/
+/user_data/hyperopts/
+/user_data/notebooks/
+/user_data/plot/
+/user_data/logs/
+/user_data/*.json
+/logs_*.log
+/scratch/
+
+# Never commit real secrets, even if someone edits this file locally
+configs/*_secret.json
+!configs/exampleconfig_secret.json

@@ -1,0 +1,63 @@
+{
+  "source": "reports/backtest_summary_20250216-20260816.json",
+  "n_trades": 323,
+  "sims": 5000,
+  "results": {
+    "bootstrap": {
+      "return_pct": {
+        "label": "bootstrap total return %",
+        "mean": 142.35,
+        "p5": 126.436,
+        "p25": 135.67,
+        "median": 142.219,
+        "p75": 149.008,
+        "p95": 158.653,
+        "worst": 108.858,
+        "best": 179.494
+      },
+      "max_drawdown_pct": {
+        "label": "bootstrap max drawdown %",
+        "mean": 1.721,
+        "p5": -0.0,
+        "p25": 1.316,
+        "median": 1.701,
+        "p75": 2.117,
+        "p95": 2.787,
+        "worst": -0.0,
+        "best": 5.191
+      },
+      "probability_of_loss_pct": 0.0,
+      "p_drawdown_over_15pct": 0.0,
+      "p_drawdown_over_20pct": 0.0,
+      "p_drawdown_over_30pct": 0.0
+    },
+    "shuffle": {
+      "return_pct": {
+        "label": "shuffle total return %",
+        "mean": 142.314,
+        "p5": 142.314,
+        "p25": 142.314,
+        "median": 142.314,
+        "p75": 142.314,
+        "p95": 142.314,
+        "worst": 142.314,
+        "best": 142.314
+      },
+      "max_drawdown_pct": {
+        "label": "shuffle max drawdown %",
+        "mean": 1.877,
+        "p5": 1.25,
+        "p25": 1.506,
+        "median": 1.806,
+        "p75": 2.137,
+        "p95": 2.726,
+        "worst": 0.997,
+        "best": 4.871
+      },
+      "probability_of_loss_pct": 0.0,
+      "p_drawdown_over_15pct": 0.0,
+      "p_drawdown_over_20pct": 0.0,
+      "p_drawdown_over_30pct": 0.0
+    }
+  }
+}

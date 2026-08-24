@@ -1,0 +1,48 @@
+{
+  // Safe-mode overrides for NostalgiaForInfinityX7Safe.
+  // Load AFTER the official config chain, e.g.:
+  //   -c configs/exampleconfig.json -c configs/exampleconfig_secret.json
+  //   -c configs/trading_mode-spot.json -c configs/local-overrides-safe.json
+  //   --strategy NostalgiaForInfinityX7Safe --enable-protections
+  //
+  // What this changes vs. upstream defaults, and why (see reports/RISK_ANALYSIS.md):
+
+  // 1) This value now only matters when NostalgiaForInfinityX7Safe.stake_sizing_mode
+  //    is set to "fixed" (default is "percent" as of 2026-08-22 - see
+  //    NostalgiaForInfinityX7Safe.custom_stake_amount() and reports/SAFE_ONLY.md
+  //    "仓位规模：固定金额 vs 百分比"). In percent mode the strategy computes
+  //    15% of current total equity (capped at $4,500) instead of reading this
+  //    config value; 1500 is kept here as the "fixed" fallback and because it
+  //    equals 15% of the $10,000 backtest baseline (dry_run_wallet), so the
+  //    two modes agree exactly at that account size.
+  "stake_amount": 1500,
+
+  // 2) Concurrent-position count. Under "fixed" stake_sizing_mode, fewer slots
+  //    meant a bigger dollar amount per slot (helps clear exchange minimum-
+  //    notional limits on grind sub-entries) - that was the reasoning for
+  //    cutting this from 4 to 3 on 2026-08-22. It no longer applies: under the
+  //    now-default "percent" stake_sizing_mode, each slot's first entry is
+  //    independently 15% of total equity regardless of how many slots are
+  //    open, so slot count does NOT change any single trade's size or its
+  //    exposure to minimum-notional limits - it only changes (a) how much of
+  //    the account can be deployed at once (4 x 15% = 60%) and (b) how many
+  //    uncorrelated positions you can hold at a time. Restored to 4
+  //    (2026-08-22) for better diversification, now that this no longer costs
+  //    anything in per-trade granularity.
+  "max_open_trades": 4,
+
+  // 3) Keep a larger cash buffer untouched by the bot at all times, so a
+  //    string of simultaneous grind triggers can't drive available balance
+  //    to zero (risk #3, liquidity trap).
+  "tradable_balance_ratio": 0.85,
+
+  // 4) Protections defined in NostalgiaForInfinityX7Safe.protections only take
+  //    effect in backtesting with --enable-protections; in dry-run/live they
+  //    are always active.
+  "unfilledtimeout": {
+    "entry": 3,
+    "exit": 2,
+    "exit_timeout_count": 0,
+    "unit": "minutes"
+  }
+}

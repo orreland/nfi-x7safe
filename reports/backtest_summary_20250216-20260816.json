@@ -1,0 +1,42 @@
+{
+  "metrics": {
+    "start_date": "20250216",
+    "end_date": "20260816",
+    "trades": 323,
+    "wins": 320,
+    "losses": 3,
+    "winrate_pct": 99.07,
+    "profit_total_pct": 142.314,
+    "profit_mean_pct": 2.3791,
+    "max_drawdown_pct": 2.63,
+    "max_drawdown_abs": 653.8442370100001,
+    "sharpe": 9.134525144954976,
+    "sortino": 9.577612215269667,
+    "calmar": 189.5260547307654,
+    "cagr": 0.8069923035641948,
+    "profit_factor": 22.765731206517213,
+    "expectancy": 44.06005546034056,
+    "market_change_pct": -72.93,
+    "result_json_path": "user_data/backtest_results/single-20250216-20260816/backtest-result-2026-08-16_13-45-56.json",
+    "daily_sharpe": 3.231,
+    "daily_sortino": 9.434,
+    "daily_max_drawdown_pct": 4.65,
+    "daily_max_drawdown_abs": 769.61,
+    "daily_ann_volatility_pct": 18.84,
+    "daily_return_total_pct": 142.383,
+    "days_in_drawdown_gt_1pct": 141,
+    "slot_utilization_pct": 35.13,
+    "slot_days_used": 1151.0,
+    "slot_days_capacity": 3276.0,
+    "longest_trade_days": 537.08,
+    "slot_days_top3_share_pct": 89.4
+  },
+  "criteria": {
+    "c1_winrate_ge_85pct": true,
+    "c2_max_drawdown_le_15pct": true,
+    "c3_net_return_nonnegative": true,
+    "c4_sharpe_nonnegative": true,
+    "num_failed": 0,
+    "passed_all": true
+  }
+}

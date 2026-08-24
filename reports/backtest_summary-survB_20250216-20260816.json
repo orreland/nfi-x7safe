@@ -1,0 +1,42 @@
+{
+  "metrics": {
+    "start_date": "20250216",
+    "end_date": "20260816",
+    "trades": 305,
+    "wins": 304,
+    "losses": 1,
+    "winrate_pct": 99.67,
+    "profit_total_pct": 191.002,
+    "profit_mean_pct": 2.8122,
+    "max_drawdown_pct": 3.78,
+    "max_drawdown_abs": 1143.4129075300007,
+    "sharpe": 5.663425660351013,
+    "sortino": -100.0,
+    "calmar": 176.7750923879063,
+    "cagr": 1.042270588626419,
+    "profit_factor": 17.70452310743122,
+    "expectancy": 62.62349945957377,
+    "market_change_pct": -75.13,
+    "result_json_path": "D:\\NostalgiaForInfinity\\user_data\\backtest_results\\single-20250216-20260816\\backtest-result-2026-08-22_15-10-21.json",
+    "daily_sharpe": 2.669,
+    "daily_sortino": 15.125,
+    "daily_max_drawdown_pct": 3.7,
+    "daily_max_drawdown_abs": 1119.68,
+    "daily_ann_volatility_pct": 28.03,
+    "daily_return_total_pct": 191.058,
+    "days_in_drawdown_gt_1pct": 9,
+    "slot_utilization_pct": 13.38,
+    "slot_days_used": 438.2,
+    "slot_days_capacity": 3276.0,
+    "longest_trade_days": 110.01,
+    "slot_days_top3_share_pct": 62.2
+  },
+  "criteria": {
+    "c1_winrate_ge_85pct": true,
+    "c2_max_drawdown_le_15pct": true,
+    "c3_net_return_nonnegative": true,
+    "c4_sharpe_nonnegative": true,
+    "num_failed": 0,
+    "passed_all": true
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "metrics": {
+    "start_date": "20250216",
+    "end_date": "20260816",
+    "trades": 310,
+    "wins": 303,
+    "losses": 7,
+    "winrate_pct": 97.74,
+    "profit_total_pct": 76.658,
+    "profit_mean_pct": 2.2969,
+    "max_drawdown_pct": 1.43,
+    "max_drawdown_abs": 155.50335546999997,
+    "sharpe": 7.1619715999403875,
+    "sortino": 7.0258595329690765,
+    "calmar": 187.18275701605646,
+    "cagr": 0.4628792149135146,
+    "profit_factor": 13.514114690184751,
+    "expectancy": 24.728446900387098,
+    "market_change_pct": -72.93,
+    "result_json_path": "D:\\NostalgiaForInfinity\\user_data\\backtest_results\\single-NostalgiaForInfinityX7Safe-20250216-20260816\\backtest-result-2026-08-22_14-50-25.json"
+  },
+  "criteria": {
+    "c1_winrate_ge_85pct": true,
+    "c2_max_drawdown_le_15pct": true,
+    "c3_net_return_nonnegative": true,
+    "c4_sharpe_nonnegative": true,
+    "num_failed": 0,
+    "passed_all": true
+  }
+}

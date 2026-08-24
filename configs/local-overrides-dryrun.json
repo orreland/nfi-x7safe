@@ -1,0 +1,58 @@
+{
+  // Dry-run launch overrides for NostalgiaForInfinityX7Safe, layered ON TOP OF
+  // configs/local-overrides-safe.json (阶段 6, reports/SAFE_ONLY.md 第七节).
+  //
+  // Load order:
+  //   -c configs/exampleconfig.json -c configs/exampleconfig_secret.json
+  //   -c configs/trading_mode-spot.json -c configs/blacklist-binance.json
+  //   -c configs/pairlist-backtest-static-binance-spot-usdt.json
+  //   -c configs/local-overrides-safe.json -c configs/local-overrides-dryrun.json
+  //   --strategy NostalgiaForInfinityX7Safe
+  //
+  // Note: this intentionally uses blacklist-binance.json (the REAL, current
+  // blacklist), not configs/blacklist-survivorship-test.json - the latter was
+  // built specifically to let already-delisted pairs back into a BACKTEST; a
+  // running dry-run bot must never try to enter symbols Binance has actually
+  // pulled. Run scripts/check_blacklist_staleness.py periodically against
+  // this real config to catch pairs the blacklist hasn't caught up to yet.
+  //
+  // dry_run / dry_run_wallet are already set in exampleconfig.json - this
+  // file must NEVER flip dry_run to false. Going live is a separate, explicit
+  // decision gated on the 阶段七 decision-point checklist in reports/SAFE_ONLY.md,
+  // not something a config layering accident should be able to trigger.
+  "dry_run": true,
+
+  // Explicit db path inside user_data/, not freqtrade's CWD-relative default -
+  // the systemd unit (scripts/deploy/nfi-dryrun.service) runs with
+  // ProtectSystem=strict + ReadWritePaths=/opt/nfi/user_data, so a default
+  // sqlite path resolving to /opt/nfi/ would fail with
+  // "unable to open database file". On a non-systemd (e.g. local Windows) run
+  // this still just puts the db under user_data/, which is harmless.
+  "db_url": "sqlite:///user_data/tradesv3.dryrun.sqlite",
+
+  // Exchange-side stop: freqtrade's dry-run engine emulates exchange-side
+  // stoploss handling when this is set, which is the closest a dry-run can
+  // get to validating "does the exchange actually accept and execute this
+  // stop order" before real money is at risk. This is 前置条件 #2 in
+  // reports/SAFE_ONLY.md 第六节.
+  "order_types": {
+    "entry": "limit",
+    "exit": "limit",
+    "emergency_exit": "market",
+    "force_entry": "limit",
+    "force_exit": "market",
+    "stoploss": "market",
+    "stoploss_on_exchange": true,
+    "stoploss_on_exchange_interval": 60,
+    "stoploss_on_exchange_limit_ratio": 0.99
+  },
+
+  // Telegram notifications are commented out on purpose - wire in your own
+  // bot token/chat id before launch if you want live alerts; do not commit
+  // real credentials to this file.
+  // "telegram": { "enabled": true, "token": "...", "chat_id": "..." },
+
+  "internals": {
+    "process_throttle_secs": 5
+  }
+}

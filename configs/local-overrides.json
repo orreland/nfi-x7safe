@@ -1,0 +1,17 @@
+{
+  "exchange": {
+    "name": "binance",
+    "ccxt_config": {
+      "options": {
+        "defaultType": "spot",
+        "fetchMarkets": ["spot"]
+      }
+    },
+    "ccxt_async_config": {
+      "options": {
+        "defaultType": "spot",
+        "fetchMarkets": ["spot"]
+      }
+    }
+  }
+}

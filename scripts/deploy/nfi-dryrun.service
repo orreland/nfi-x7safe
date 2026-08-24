@@ -1,0 +1,30 @@
+[Unit]
+Description=NostalgiaForInfinityX7Safe dry-run
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=nfi
+WorkingDirectory=/opt/nfi
+ExecStart=/opt/nfi/.venv/bin/freqtrade trade \
+  -c /opt/nfi/configs/exampleconfig.json \
+  -c /opt/nfi/configs/exampleconfig_secret.json \
+  -c /opt/nfi/configs/trading_mode-spot.json \
+  -c /opt/nfi/configs/blacklist-binance.json \
+  -c /opt/nfi/configs/pairlist-backtest-static-binance-spot-usdt.json \
+  -c /opt/nfi/configs/local-overrides-safe.json \
+  -c /opt/nfi/configs/local-overrides-dryrun.json \
+  --strategy NostalgiaForInfinityX7Safe \
+  --strategy-path /opt/nfi/user_data/strategies \
+  --logfile /opt/nfi/user_data/logs/dryrun.log
+Restart=on-failure
+RestartSec=30
+
+# Hardening: this process should never need root or write outside its own dir
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/nfi/user_data
+
+[Install]
+WantedBy=multi-user.target

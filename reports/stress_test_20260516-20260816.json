@@ -1,0 +1,87 @@
+{
+  "start": "20260516",
+  "end": "20260816",
+  "strategy": "NostalgiaForInfinityX7",
+  "fee_sweep_pct_round_trip": [
+    {
+      "fee_pct": 0.1,
+      "trades": 40,
+      "winrate_pct": 97.5,
+      "total_return_pct": 9.229,
+      "max_drawdown_pct": 3.76,
+      "sharpe": 2.412784091196049
+    },
+    {
+      "fee_pct": 0.15,
+      "trades": 38,
+      "winrate_pct": 97.37,
+      "total_return_pct": 7.127,
+      "max_drawdown_pct": 3.86,
+      "sharpe": 1.9057643928042804
+    },
+    {
+      "fee_pct": 0.2,
+      "trades": 38,
+      "winrate_pct": 97.37,
+      "total_return_pct": 6.725,
+      "max_drawdown_pct": 4.08,
+      "sharpe": 1.7250199956786203
+    },
+    {
+      "fee_pct": 0.3,
+      "trades": 38,
+      "winrate_pct": 97.37,
+      "total_return_pct": 7.446,
+      "max_drawdown_pct": 4.09,
+      "sharpe": 1.8780136200722382
+    }
+  ],
+  "pair_concentration": {
+    "total_pairs_traded": 82,
+    "total_profit_abs": 14231.4,
+    "top_pairs": [
+      {
+        "pair": "DASH/USDT",
+        "profit_abs": 2042.82
+      },
+      {
+        "pair": "QI/USDT",
+        "profit_abs": 786.82
+      },
+      {
+        "pair": "1INCH/USDT",
+        "profit_abs": 671.68
+      },
+      {
+        "pair": "FIL/USDT",
+        "profit_abs": 663.17
+      },
+      {
+        "pair": "DYDX/USDT",
+        "profit_abs": 633.11
+      },
+      {
+        "pair": "ICP/USDT",
+        "profit_abs": 565.42
+      },
+      {
+        "pair": "INJ/USDT",
+        "profit_abs": 495.23
+      },
+      {
+        "pair": "ZEN/USDT",
+        "profit_abs": 408.54
+      },
+      {
+        "pair": "VET/USDT",
+        "profit_abs": 388.89
+      },
+      {
+        "pair": "ADA/USDT",
+        "profit_abs": 328.22
+      }
+    ],
+    "top_n": 10,
+    "top_n_share_of_total_profit_pct": 49.1
+  }
+}
