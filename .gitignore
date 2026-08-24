@@ -23,3 +23,8 @@ __pycache__/
 # Never commit real secrets, even if someone edits this file locally
 configs/*_secret.json
 !configs/exampleconfig_secret.json
+
+# Upstream base class - byte-identical copy of nfi_repo/NostalgiaForInfinityX7.py.
+# Not redistributed here; README documents the clone+cp step, and
+# scripts/preflight.py verifies the two stay in sync.
+/user_data/strategies/NostalgiaForInfinityX7.py
