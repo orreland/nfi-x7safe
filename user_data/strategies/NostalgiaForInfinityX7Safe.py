@@ -46,8 +46,10 @@ keeps working; point freqtrade here via --strategy NostalgiaForInfinityX7Safe.
 """
 
 import logging
-from datetime import datetime
+from collections import Counter
+from datetime import datetime, timedelta
 
+from freqtrade.enums import RunMode
 from freqtrade.persistence import Trade
 
 from NostalgiaForInfinityX7 import NostalgiaForInfinityX7
@@ -196,14 +198,93 @@ class NostalgiaForInfinityX7Safe(NostalgiaForInfinityX7):
 
   # --- instrumentation ------------------------------------------------------
   # Counts how often each added control actually fires. A risk control that
-  # never triggers has not been validated, it has merely been installed - so
-  # these get logged at the end of the run.
+  # never triggers has not been validated, it has merely been installed.
+  #
+  # Two layers (2026-10-17):
+  #  - SAFE-TRIGGER [...] lines: one per decision, from an in-memory counter.
+  #    That counter starts at 0 on every process start, so with the weekly
+  #    controlled restart its "#n" is only "n-th since the last restart".
+  #  - SAFE-TRIGGER-SUMMARY: in dry-run/live, recomputed from the trades table
+  #    (closed trades by exit_reason) at startup and then hourly. It survives
+  #    restarts and also covers exits the strategy never sees as a decision -
+  #    exchange-side stop fills (stoploss_on_exchange) and emergency_exit -
+  #    which the in-memory counter missed entirely. In backtesting it keeps
+  #    printing the in-memory counter, throttled to once per candle-hour.
   _safe_trigger_counts: dict = {}
+  _safe_summary_every = timedelta(hours=1)
+  _safe_summary_last = None
 
   def _record_trigger(self, name: str, pair: str, current_time, detail: str = "") -> None:
     counts = type(self)._safe_trigger_counts
     counts[name] = counts.get(name, 0) + 1
-    log.info(f"SAFE-TRIGGER [{name}] #{counts[name]} [{current_time}] [{pair}] {detail}")
+    log.info(f"SAFE-TRIGGER [{name}] #{counts[name]} since start [{current_time}] [{pair}] {detail}")
+
+  @staticmethod
+  def _classify_exit(exit_reason) -> str | None:
+    """Map a closed trade's exit_reason to the safety control that closed it."""
+    reason = str(exit_reason or "")
+    if "stoploss_doom" in reason:
+      return "doom_stop"
+    if reason.startswith("exit_time_stop"):
+      return "time_stop"
+    if reason in ("stop_loss", "trailing_stop_loss"):
+      return "hard_stop_honored"  # passed confirm_trade_exit (section 9)
+    if reason == "stoploss_on_exchange":
+      return "hard_stop_exchange"  # filled on the exchange, never seen by the strategy
+    if reason == "emergency_exit":
+      return "emergency_exit"
+    return None
+
+  def _db_trigger_counts(self) -> dict:
+    counts = Counter()
+    for trade in Trade.get_trades_proxy(is_open=False):
+      kind = self._classify_exit(trade.exit_reason)
+      if kind:
+        counts[kind] += 1
+    return dict(sorted(counts.items()))
+
+  # ==========================================================================
+  # 9. Exchange-side stoploss handoff
+  # ==========================================================================
+  # Upstream confirm_trade_exit() (X7.py:12680) unconditionally denies any
+  # exit_reason in ("stop_loss", "trailing_stop_loss") unless it is a
+  # liquidation - by design, upstream wants only its own tag-driven exit
+  # signals to fire, never freqtrade's blunt percentage stop.
+  #
+  # This deployment also runs stoploss_on_exchange=True
+  # (configs/local-overrides-dryrun.json), specifically to validate "does the
+  # exchange actually accept and execute this stop order" before risking real
+  # money. Combined with the blanket denial above, that validation was
+  # silently failing: freqtrade tries to (re)place the exchange-side stop
+  # every process_throttle_secs, gets denied each time by confirm_trade_exit,
+  # and by the time price has run far enough that a *new* stop order would
+  # trigger immediately, dry-run can't place it and force-exits at market
+  # (exit_reason=emergency_exit) - at a worse price than the configured stop
+  # would have given. Confirmed 100% (4/4 emergency_exit trades, 17 "User
+  # denied exit" log lines) against QI/USDT x2, TFUEL/USDT, VTHO/USDT, 2026-09.
+  #
+  # Fix: once stoploss_on_exchange is enabled, the exchange - not this bot's
+  # 5-second polling loop - is the authority on whether the stop actually
+  # fired, so trust it and let the exit through instead of re-litigating it
+  # every loop only to force a worse exit later.
+  def confirm_trade_exit(
+    self,
+    pair: str,
+    trade: "Trade",
+    order_type: str,
+    amount: float,
+    rate: float,
+    time_in_force: str,
+    exit_reason: str,
+    current_time: "datetime",
+    **kwargs,
+  ) -> bool:
+    if exit_reason in ("stop_loss", "trailing_stop_loss") and self.order_types.get("stoploss_on_exchange"):
+      self._record_trigger("exchange_stoploss_honored", pair, current_time, f"reason={exit_reason}")
+      return True
+    return super().confirm_trade_exit(
+      pair, trade, order_type, amount, rate, time_in_force, exit_reason, current_time, **kwargs
+    )
 
   def custom_exit(
     self, pair: str, trade: "Trade", current_time: "datetime", current_rate: float, current_profit: float, **kwargs
@@ -231,9 +312,19 @@ class NostalgiaForInfinityX7Safe(NostalgiaForInfinityX7):
 
   def bot_loop_start(self, current_time: datetime, **kwargs) -> None:
     super().bot_loop_start(current_time, **kwargs)
-    counts = type(self)._safe_trigger_counts
-    if counts:
-      log.info(f"SAFE-TRIGGER-SUMMARY {counts}")
+    last = type(self)._safe_summary_last
+    if last is not None and current_time - last < self._safe_summary_every:
+      return
+    type(self)._safe_summary_last = current_time
+    if self.dp.runmode in (RunMode.DRY_RUN, RunMode.LIVE):
+      try:
+        log.info(f"SAFE-TRIGGER-SUMMARY (all closed trades, from DB) {self._db_trigger_counts()}")
+      except Exception as e:  # instrumentation must never stop the bot
+        log.warning(f"SAFE-TRIGGER-SUMMARY unavailable: {e}")
+    else:
+      counts = type(self)._safe_trigger_counts
+      if counts:
+        log.info(f"SAFE-TRIGGER-SUMMARY (decisions this run) {counts}")
 
   # ==========================================================================
   # 7. Bot-level circuit breakers (freqtrade Protections)
@@ -254,6 +345,13 @@ class NostalgiaForInfinityX7Safe(NostalgiaForInfinityX7):
         "trade_limit": 10,
         "stop_duration_candles": 288,  # pause all new entries for 24h
         "max_allowed_drawdown": 0.10,  # account drawdown over the lookback
+        # 2026-10-18: without this, freqtrade defaults to "ratios" - the
+        # drawdown of the SUM of per-trade profit ratios, regardless of size -
+        # which fired 4 times in the 18-month backtest while the account was
+        # down < 1% each time. "equity" measures realized USDT P&L against the
+        # account, which is what the line above says. See
+        # reports/REBUY_AB_PARITY_2026-10-17.md sections 19/20.
+        "calculation_mode": "equity",
       },
       {
         "method": "StoplossGuard",

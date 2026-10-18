@@ -34,6 +34,46 @@ RUNS = [
   ("[对齐] 现状", "stopgrid-parity-X7SafeStopHonored"),
   ("[对齐] 只关64/65", "stopgrid-parity-X7SafeStopHonoredNo6465"),
   ("[对齐] 关61-65", "stopgrid-parity-X7SafeStopHonoredNoRebuy"),
+  # rebuy 单独止损实验（预注册见报告第十二节）
+  ("[W1] R0 现状复跑", "stopgrid-rerun-X7SafeStopHonored"),
+  ("[W1] A1 rebuy止损25%", "stopgrid-X7SafeRebuyStop25"),
+  ("[W1] B10 rebuy doom0.10", "stopgrid-X7SafeRebuyDoom10"),
+  ("[W1] B15 rebuy doom0.15", "stopgrid-X7SafeRebuyDoom15"),
+  ("[W1] B20 rebuy doom0.20", "stopgrid-X7SafeRebuyDoom20"),
+  ("[W2] 现状(延长至10-17)", "stopgrid-ext-X7SafeStopHonored"),
+  ("[W2] A1 rebuy止损25%", "stopgrid-ext-X7SafeRebuyStop25"),
+  ("[W2] B10 rebuy doom0.10", "stopgrid-ext-X7SafeRebuyDoom10"),
+  ("[W2] B15 rebuy doom0.15", "stopgrid-ext-X7SafeRebuyDoom15"),
+  ("[W2] B20 rebuy doom0.20", "stopgrid-ext-X7SafeRebuyDoom20"),
+  ("[W3] A1 rebuy止损25%", "stopgrid-parity-X7SafeRebuyStop25"),
+  ("[W3] B10 rebuy doom0.10", "stopgrid-parity-X7SafeRebuyDoom10"),
+  ("[W3] B15 rebuy doom0.15", "stopgrid-parity-X7SafeRebuyDoom15"),
+  ("[W3] B20 rebuy doom0.20", "stopgrid-parity-X7SafeRebuyDoom20"),
+  # 非 rebuy 硬止损实验（预注册见报告第十四节）
+  ("[W1] N20 非rebuy止损20%", "stopgrid-X7SafeOtherStop20"),
+  ("[W1] N25 非rebuy止损25%", "stopgrid-X7SafeOtherStop25"),
+  ("[W1] N0 非rebuy无硬止损", "stopgrid-X7SafeOtherNoStop"),
+  ("[W2] N20 非rebuy止损20%", "stopgrid-ext-X7SafeOtherStop20"),
+  ("[W2] N25 非rebuy止损25%", "stopgrid-ext-X7SafeOtherStop25"),
+  ("[W2] N0 非rebuy无硬止损", "stopgrid-ext-X7SafeOtherNoStop"),
+  ("[W3] N20 非rebuy止损20%", "stopgrid-parity-X7SafeOtherStop20"),
+  ("[W3] N25 非rebuy止损25%", "stopgrid-parity-X7SafeOtherStop25"),
+  ("[W3] N0 非rebuy无硬止损", "stopgrid-parity-X7SafeOtherNoStop"),
+  # W4：live universe（118 幸存币），时间同 W1，用于 B15 弱复验
+  ("[W4] 现状", "stopgrid-w4-X7SafeStopHonored"),
+  ("[W4] B15 rebuy doom0.15", "stopgrid-w4-X7SafeRebuyDoom15"),
+  ("[W4] N20 非rebuy止损20%", "stopgrid-w4-X7SafeOtherStop20"),
+  ("[W4] N25 非rebuy止损25%", "stopgrid-w4-X7SafeOtherStop25"),
+  ("[W4] N0 非rebuy无硬止损", "stopgrid-w4-X7SafeOtherNoStop"),
+  # MaxDrawdown 改按账户权益计算（预注册见报告第十九节）
+  ("[W1] E10 回撤保护equity10%", "stopgrid-X7SafeDDEquity10"),
+  ("[W1] E5 回撤保护equity5%", "stopgrid-X7SafeDDEquity5"),
+  ("[W2] E10 回撤保护equity10%", "stopgrid-ext-X7SafeDDEquity10"),
+  ("[W2] E5 回撤保护equity5%", "stopgrid-ext-X7SafeDDEquity5"),
+  ("[W3] E10 回撤保护equity10%", "stopgrid-parity-X7SafeDDEquity10"),
+  ("[W3] E5 回撤保护equity5%", "stopgrid-parity-X7SafeDDEquity5"),
+  # 2026-10-18 起 X7Safe 默认用 equity 口径；新的 W1 基线（与 E10 逐笔相同）
+  ("[W1] 新基线(equity口径)", "stopgrid-e10chk-X7SafeStopHonored"),
 ]
 
 
@@ -41,7 +81,8 @@ def trade_stats(run_dir: str) -> dict:
   stats = next(iter(json.loads(Path(_result_json(run_dir)).read_text(encoding="utf-8"))["strategy"].values()))
   trades = stats["trades"]
   rebuy = [t for t in trades if set((t["enter_tag"] or "").split()) & REBUY_TAGS]
-  stops = [t for t in trades if t["exit_reason"] == "stop_loss"]
+  # custom_stoploss-driven stops (X7SafeRebuyStop25) report "trailing_stop_loss"
+  stops = [t for t in trades if t["exit_reason"] in ("stop_loss", "trailing_stop_loss")]
   wins = sum(t["profit_abs"] for t in trades if t["profit_abs"] > 0)
   losses = -sum(t["profit_abs"] for t in trades if t["profit_abs"] < 0)
   return {
