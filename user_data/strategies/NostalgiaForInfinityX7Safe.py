@@ -51,6 +51,7 @@ from datetime import datetime, timedelta
 
 from freqtrade.enums import RunMode
 from freqtrade.persistence import Trade
+from freqtrade.strategy import stoploss_from_absolute
 
 from NostalgiaForInfinityX7 import NostalgiaForInfinityX7
 
@@ -64,12 +65,71 @@ class NostalgiaForInfinityX7Safe(NostalgiaForInfinityX7):
   # Upstream default is -0.99 (effectively disabled). This is freqtrade's own
   # stoploss and always wins regardless of what the strategy's own logic decides.
   #
-  # NOTE ON WHY THIS RARELY FIRES: freqtrade measures this against the trade's
-  # *average* open rate, and grinding continuously averages down. A position can
-  # be deeply underwater versus its first entry while sitting within 15% of its
-  # average. This is a genuine worst-case floor, not a working stop - the doom
-  # stop below is the one expected to do the work.
+  # CORRECTION (2026-10-18): this stop is anchored at the FIRST entry price,
+  # not the average. freqtrade sets the static stop once at open; after a DCA
+  # fill it recomputes from the new average but only ever lets the stop walk
+  # UP, so averaging down never lowers it. (The earlier note here said the
+  # opposite.) Since 2026-10-19 this value only applies to rebuy-mode trades;
+  # everything else uses `other_hard_stop` below.
   stoploss = -0.15
+
+  # ==========================================================================
+  # 1b. Per-side hard stop -- N25 (2026-10-19)
+  # ==========================================================================
+  # Non-rebuy trades: hard stop at (1 - other_hard_stop) x first entry price.
+  # Rebuy trades keep `stoploss` above (-15%). In the 18-month backtest the -15%
+  # stop cut 14 non-rebuy trades for -2331 USDT, most of which recovered when
+  # left alone; -25% passed every pre-registered check (report sections 14-17:
+  # W1 +132.2% / DD 10.29% vs +123.0% / 10.75%, W4 replication, 10-segment
+  # consistency). The doom stop and the 30-day time stop still apply.
+  #
+  # Mechanics: a side whose distance equals `stoploss` is not touched at all
+  # (any custom move rewrites trade.stop_loss_pct, which later DCA recalcs
+  # reuse). For the widened side, custom_stoploss acts exactly once - in the
+  # after_fill call for the trade's FIRST entry - and moves the stop down to
+  # the absolute price (1 - distance) x first entry (allow_refresh=True is the
+  # only way freqtrade lets a stop move down). With stoploss_on_exchange,
+  # freqtrade cancels any exchange stop when an entry fills and places a new
+  # one at trade.stop_loss on the next loop, so the exchange stop starts at
+  # -25% instead of being created at -15% and never lowered.
+  use_custom_stoploss = True
+  rebuy_hard_stop = 0.15
+  other_hard_stop = 0.25
+
+  def _is_rebuy_trade(self, trade: Trade) -> bool:
+    """Same test as X7's is_rebuy_mode in the long exit / adjust paths."""
+    enter_tags = (trade.enter_tag or "").split()
+    rebuy_tags = self.long_rebuy_mode_tags
+    return bool(enter_tags) and (
+      all(c in rebuy_tags for c in enter_tags)
+      or (any(c in rebuy_tags for c in enter_tags) and all(c in self.long_rebuy_grind_mode_tags for c in enter_tags))
+    )
+
+  def custom_stoploss(
+    self,
+    pair: str,
+    trade: Trade,
+    current_time: datetime,
+    current_rate: float,
+    current_profit: float,
+    after_fill: bool,
+    **kwargs,
+  ):
+    if not after_fill or trade.nr_of_successful_entries != 1 or trade.nr_of_successful_exits != 0:
+      return None
+    distance = self.rebuy_hard_stop if self._is_rebuy_trade(trade) else self.other_hard_stop
+    if distance == -self.stoploss:
+      return None
+    first_price = trade.select_filled_orders(trade.entry_side)[0].safe_price
+    stop = stoploss_from_absolute(
+      first_price * (1.0 - distance), current_rate, is_short=trade.is_short, leverage=trade.leverage
+    )
+    if stop:
+      log.info(
+        f"HARD-STOP-SET [{pair}] {'rebuy' if distance == self.rebuy_hard_stop else 'other'} "
+        f"-{distance * 100:.0f}% of first entry {first_price} -> stop {first_price * (1.0 - distance)}"
+      )
+    return stop or None
 
   # ==========================================================================
   # 2. Doom stop -- THE FIX

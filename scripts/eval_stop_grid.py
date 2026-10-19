@@ -74,6 +74,8 @@ RUNS = [
   ("[W3] E5 回撤保护equity5%", "stopgrid-parity-X7SafeDDEquity5"),
   # 2026-10-18 起 X7Safe 默认用 equity 口径；新的 W1 基线（与 E10 逐笔相同）
   ("[W1] 新基线(equity口径)", "stopgrid-e10chk-X7SafeStopHonored"),
+  # 2026-10-19 起 X7Safe 默认 = N25 + E10（服务器部署版本）
+  ("[W1] 部署版 N25+E10", "stopgrid-n25chk-X7SafeStopHonored"),
 ]
 
 
