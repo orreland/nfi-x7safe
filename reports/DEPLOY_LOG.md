@@ -9,7 +9,7 @@
 | 项 | 值 |
 |---|---|
 | 运行中的策略文件 | `/opt/nfi/user_data/strategies/NostalgiaForInfinityX7Safe.py` |
-| 加载进内存的版本 | 见下表最后一条「已生效」的记录 |
+| 加载进内存的版本 | **#4（N25 + E10），2026-10-25 07:15:20 UTC 起**，PID 1140593 |
 | 每周重启 | `nfi-dryrun-restart.timer`，周日 03:17 UTC（随机延迟 ≤ 5 分钟）；**有持仓时跳过**，顺延一周 |
 | 确认当前加载的是哪版 | 重启时间 `systemctl show nfi-dryrun -p ActiveEnterTimestamp` 晚于该版的部署时间，即已加载 |
 
@@ -20,8 +20,8 @@
 | 0 | 2026-08-24 | 2026-08-30 23:50 首笔 | dry-run 启动：X7Safe（doom 止损接线、30 天时间止损、grind 预算 0.5、百分比仓位） | `eb879d…` | — |
 | 1 | 2026-09-30 05:27 | 2026-09-30 05:28（手动重启） | confirm_trade_exit 放行 stoploss_on_exchange 的止损，修 emergency_exit 竞态；同时加了每周受控重启 | `7852fb…` | `.bak-20260930052733` |
 | 2 | 2026-10-17 12:04 | 2026-10-18 03:19（每周重启） | 只改统计和日志：SAFE-TRIGGER 汇总改为每小时从 trades 表统计，重启不清零 | `de52d5…` | `.bak-20261017120411` |
-| 3 | 2026-10-18 15:48 | 2026-10-25 03:19 起的首次重启（待生效） | MaxDrawdown 保护改为按账户权益计算（`calculation_mode: equity`，E10），去掉误报 | `150278…` | `.bak-20261018154834` |
-| 4 | 2026-10-18 16:47 | 2026-10-25 03:19 起的首次重启（待生效，与 #3 同时） | **N25：非 rebuy 交易的硬止损从首仓价 −15% 放宽到 −25%**，rebuy 仍为 −15%；新增 `HARD-STOP-SET` 日志行 | `5cd599…` | `.bak-20261018164737` |
+| 3 | 2026-10-18 15:48 | **2026-10-25 07:15:20（空仓时手动重启）** | MaxDrawdown 保护改为按账户权益计算（`calculation_mode: equity`，E10），去掉误报 | `150278…` | `.bak-20261018154834` |
+| 4 | 2026-10-18 16:47 | **2026-10-25 07:15:20（与 #3 同时）** | **N25：非 rebuy 交易的硬止损从首仓价 −15% 放宽到 −25%**，rebuy 仍为 −15%；新增 `HARD-STOP-SET` 日志行 | `5cd599…` | `.bak-20261018164737` |
 
 各次改动的依据与回测，见 `reports/REBUY_AB_PARITY_2026-10-17.md`：#1 见文件内第 9 节注释，#2 见第 18.3 节，#3 见第十九、二十节，#4 见第十四~十七、二十一节。
 
@@ -30,6 +30,24 @@
 ```bash
 install -o nfi -g nfi -m 644 /opt/nfi/user_data/strategies/NostalgiaForInfinityX7Safe.py.<备份> /opt/nfi/user_data/strategies/NostalgiaForInfinityX7Safe.py
 ```
+
+### 生效情况追记
+
+- **2026-10-25 03:17 UTC：** 每周重启**被跳过**。`nfi_safe_restart: 1 open trade(s) - skipping restart`，当时持有 AVA/USDT（tag 64，03:55 以 +1.92% 平仓）。
+  #3、#4 仍未加载，进程仍是 10-18 03:19 起的 PID 977055；下次自动尝试是 2026-11-01 03:17 UTC。
+  07:13 UTC 检查时已空仓。
+- **2026-10-25 07:15:20 UTC：用户确认后手动重启，#3（E10）与 #4（N25）生效。**
+  - 重启前三重确认空仓：DB 持仓 0、未完成订单 0、API `count` 返回 current 0；线上文件 sha256 为 `5cd599…`；
+  - 用服务器自带的 `/opt/nfi/scripts/nfi_safe_restart.py` 重启，它会再检查一次持仓（输出 `no open trades - restarting`）；
+  - 重启后：新 PID 1140593，`ActiveEnterTimestamp` 为 07:15:20，NRestarts 0；
+  - 启动日志：`Strategy using use_custom_stoploss: True`（只有 #4 的代码会打开它）、`stoploss: -0.15`、
+    MaxDrawdown / Cooldown / StoplossGuard 三个保护都已加载，`Dry run is enabled`；
+    `__pycache__` 里的 X7Safe 字节码在 07:15:32 重新编译，确认加载的是新文件；
+  - 07:16:44 心跳 `state='RUNNING'`；SAFE-TRIGGER 汇总正常输出
+    （doom 4 / emergency_exit 4 / 交易所侧止损 6 / 补丁放行 2）；重启后没有任何 ERROR 或 Traceback；
+    服务内存 791 MB，系统可用 692 MB。
+  - **dry-run 新样本从 2026-10-25 07:15:20 UTC 开始**：此后新开的交易适用 N25 + E10，之前的 72 笔（−756.31 USDT）属于旧规则。
+  - **还没完成的验证：** 交易所侧止损单是否直接挂在 −25%。要等第一笔非 rebuy 交易成交后，按 #4 第 1~3 点检查。
 
 ### #4 N25 详细记录
 
