@@ -87,6 +87,19 @@ install -o nfi -g nfi -m 644 /opt/nfi/user_data/strategies/NostalgiaForInfinityX
 - **回滚：** `install -o nfi -g nfi -m 644 /opt/nfi/user_data/strategies/NostalgiaForInfinityX7Safe.py.bak-20261018164737 /opt/nfi/user_data/strategies/NostalgiaForInfinityX7Safe.py`
   （回到只有 #3 的版本），然后重启。
 
+## 监控：Telegram 推送（2026-10-25 14:24 UTC 启用）
+
+方案见 `reports/MONITORING_PLAN.md`（B 方案：服务器脚本 + Telegram）。**只读**：不连机器人 API，不改任何配置，只读 systemd / docker 状态、日志尾部和 sqlite（只读模式）。
+
+| 项 | 内容 |
+|---|---|
+| 脚本 | `/opt/nfi/scripts/tg_monitor.py`（仓库 `scripts/deploy/tg_monitor.py`） |
+| 凭据 | `/root/.tg_monitor.env`（600，只有 root 可读）：`TG_TOKEN` 由用户自己写入，`TG_CHAT_ID` 由脚本从 getUpdates 自动获取并保存。Claude 没有接触 token |
+| 3 日报 | `tg-monitor-report.timer`：每天 01:00 UTC（北京 09:00）检查，距上次 ≥ 3 天才发。首次 2026-10-25 14:24 手动发送，下次约 10-29 09:00（北京） |
+| 告警 | `tg-monitor-alert.timer`：每 10 分钟检查，只在异常时发，同一条 6 小时内不重复。异常条件：服务停止、心跳 > 10 分钟、新的报错类型（排除每天 00:04 的 asyncio 噪音）、可用内存 < 200 MB、磁盘 > 85%、单笔亏损 > 100 USDT、本期合计亏损 > 2%、N25 普通交易的交易所止损不在 ×0.75 |
+| 状态文件 | `/var/lib/tg_monitor/state.json`（上次报告时间、已发告警） |
+| 停用 | `systemctl disable --now tg-monitor-report.timer tg-monitor-alert.timer` |
+
 ## Combined_V3（Docker `combined_v3_dryrun`）
 
 | # | 时间（UTC） | 改动 |
