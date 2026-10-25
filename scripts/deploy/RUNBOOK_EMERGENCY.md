@@ -50,6 +50,9 @@ ftapi nfi POST stopentry
 ftapi v3  POST stopentry
 ```
 
+执行后 `show_config` 里的 state 显示为 **`paused`**（freqtrade 2026.7 的叫法），API 返回
+`paused, no more entries will occur from now`。
+
 恢复：`ftapi nfi POST start` / `ftapi v3 POST start`（重启进程也会恢复）。
 
 ### L2 平掉所有仓位（先做 L1，避免平完又开新仓）
@@ -69,7 +72,9 @@ systemctl stop nfi-dryrun-restart.timer     # 否则周日 03:17 的定时器可
 docker stop combined_v3_dryrun              # 重启策略是 unless-stopped，手动 stop 后不会自启
 ```
 
-确认：`systemctl is-active nfi-dryrun` 显示 `inactive`，`docker ps` 里没有 `combined_v3_dryrun`。
+确认：`systemctl is-active nfi-dryrun` 显示 `inactive` 或 **`failed`**，`docker ps` 里没有 `combined_v3_dryrun`。
+显示 `failed` 是正常的：freqtrade 收到停止信号时以退出码 130 退出，systemd 把非 0 退出记为 failed；
+因为是手动停止，`Restart=on-failure` 不会把它拉起来（演练中已确认）。
 
 恢复：
 
@@ -123,3 +128,12 @@ docker kill combined_v3_dryrun
 5. 记录每一步实际耗时，写回本文件末尾。
 
 演练会改变机器人状态，需要你在场时进行。
+
+### 演练记录
+
+| 日期（UTC） | 执行 | 结果与耗时 |
+|---|---|---|
+| 2026-10-25 07:27~07:30 | 用户在场，Claude 按本手册执行。开始前两个机器人都空仓（`count` current 0，state running） | **L1** `stopentry`：两边 0.4 秒内生效，state 变为 `paused`<br>**L2** `forceexit all`（空仓，在 paused 状态下做）：0.5 秒，返回 `Created exit orders for all open trades`，count 仍为 0<br>**L3 停止**：API `stop` + `systemctl stop` + 停定时器 + `docker stop`，15 秒完成；NFI 显示 `failed`（退出码 130，正常）<br>**L3 恢复**：`systemctl start` + 启定时器 + `docker start`，**约 92 秒**后两边心跳恢复，state 回到 `running`，仍空仓，定时器下次 11-01 03:20，无报错 |
+
+结论：手册命令全部可用。真出事时，从 SSH 登录到「停止开新仓」不到 1 分钟；完整停机 15 秒；
+重启恢复要等约 1.5 分钟（NFI 启动时要加载数据、计算指标）。

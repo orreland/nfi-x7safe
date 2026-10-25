@@ -76,6 +76,19 @@ RUNS = [
   ("[W1] 新基线(equity口径)", "stopgrid-e10chk-X7SafeStopHonored"),
   # 2026-10-19 起 X7Safe 默认 = N25 + E10（服务器部署版本）
   ("[W1] 部署版 N25+E10", "stopgrid-n25chk-X7SafeStopHonored"),
+  # 在 N25+E10 底座上处理 rebuy（预注册见报告第二十二节）
+  ("[W1] RH rebuy仓位减半", "stopgrid-r22-X7SafeRebuyHalf"),
+  ("[W1] R25 rebuy止损也-25%", "stopgrid-r22-X7SafeBothStop25"),
+  ("[W4] 部署版 N25+E10", "stopgrid-r22w4-X7SafeStopHonored"),
+  ("[W4] RH rebuy仓位减半", "stopgrid-r22w4-X7SafeRebuyHalf"),
+  ("[W4] R25 rebuy止损也-25%", "stopgrid-r22w4-X7SafeBothStop25"),
+  ("[W3] 部署版 N25+E10", "stopgrid-r22p-X7SafeStopHonored"),
+  ("[W3] RH rebuy仓位减半", "stopgrid-r22p-X7SafeRebuyHalf"),
+  ("[W3] R25 rebuy止损也-25%", "stopgrid-r22p-X7SafeBothStop25"),
+  # 在 N25+E10 底座上关掉 rebuy（预注册见报告第二十四节）
+  ("[W1] NR 关rebuy 61-65", "stopgrid-r24-X7SafeN25NoRebuy"),
+  ("[W4] NR 关rebuy 61-65", "stopgrid-r24w4-X7SafeN25NoRebuy"),
+  ("[W3] NR 关rebuy 61-65", "stopgrid-r24p-X7SafeN25NoRebuy"),
 ]
 
 

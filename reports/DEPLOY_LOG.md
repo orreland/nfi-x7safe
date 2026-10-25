@@ -9,7 +9,7 @@
 | 项 | 值 |
 |---|---|
 | 运行中的策略文件 | `/opt/nfi/user_data/strategies/NostalgiaForInfinityX7Safe.py` |
-| 加载进内存的版本 | **#4（N25 + E10），2026-10-25 07:15:20 UTC 起**，PID 1140593 |
+| 加载进内存的版本 | **#4（N25 + E10），2026-10-25 07:15:20 UTC 起**（07:28 演练时重启过一次，当前 PID 1141453） |
 | 每周重启 | `nfi-dryrun-restart.timer`，周日 03:17 UTC（随机延迟 ≤ 5 分钟）；**有持仓时跳过**，顺延一周 |
 | 确认当前加载的是哪版 | 重启时间 `systemctl show nfi-dryrun -p ActiveEnterTimestamp` 晚于该版的部署时间，即已加载 |
 
@@ -48,6 +48,9 @@ install -o nfi -g nfi -m 644 /opt/nfi/user_data/strategies/NostalgiaForInfinityX
     服务内存 791 MB，系统可用 692 MB。
   - **dry-run 新样本从 2026-10-25 07:15:20 UTC 开始**：此后新开的交易适用 N25 + E10，之前的 72 笔（−756.31 USDT）属于旧规则。
   - **还没完成的验证：** 交易所侧止损单是否直接挂在 −25%。要等第一笔非 rebuy 交易成交后，按 #4 第 1~3 点检查。
+- **2026-10-25 07:27~07:30 UTC：应急手册演练**（`scripts/deploy/RUNBOOK_EMERGENCY.md` 第 6 节），两个机器人都空仓。
+  NFI 与 Combined_V3 各停一次、启动一次；代码没有改动，仍是 #4。NFI 新 PID 1141453（07:28:12 启动），
+  Combined_V3 容器重启一次。演练期间没有任何交易，dry-run 新样本的起点仍是 07:15:20。
 
 ### #4 N25 详细记录
 
@@ -89,3 +92,4 @@ install -o nfi -g nfi -m 644 /opt/nfi/user_data/strategies/NostalgiaForInfinityX
 | # | 时间（UTC） | 改动 |
 |---|---|---|
 | 0 | 2026-09-06 08:49 | 容器启动（Combined_V3，钱包 1000，max_open_trades 5）。此后没有改动 |
+| — | 2026-10-25 07:28 | 应急手册演练：`docker stop` / `docker start` 各一次，代码和配置没有改动 |

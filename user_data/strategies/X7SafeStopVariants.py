@@ -271,3 +271,31 @@ class X7SafeDDEquity5(_MaxDrawdownEquity):
   """E5: MaxDrawdown measured on account equity, threshold 5%."""
 
   max_drawdown_equity_threshold = 0.05
+
+
+# ---------------------------------------------------------------------------
+# Rebuy on the N25 + E10 base (pre-registered 2026-10-25, report section 22).
+# X7SafeStopHonored now inherits N25 + E10 from NostalgiaForInfinityX7Safe.
+# ---------------------------------------------------------------------------
+
+
+class X7SafeRebuyHalf(X7SafeStopHonored):
+  """RH: rebuy first entry 0.25 -> 0.125 x a normal stake; adds are sized off
+  the first entry, so the whole rebuy position halves."""
+
+  system_v3_rebuy_mode_stake_multiplier = 0.125
+
+
+class X7SafeBothStop25(X7SafeStopHonored):
+  """R25: rebuy hard stop also at 0.75 x first entry (non-rebuy already is)."""
+
+  rebuy_hard_stop = 0.25
+
+
+class X7SafeN25NoRebuy(X7SafeStopHonored):
+  """NR (report section 24): N25 + E10 base with rebuy entries 61-65 switched
+  off (68 is already off upstream). Exit / adjust logic untouched."""
+
+  long_entry_signal_params = _without_rebuy_entries(
+    NostalgiaForInfinityX7Safe.long_entry_signal_params, tags=("61", "62", "63", "64", "65")
+  )
