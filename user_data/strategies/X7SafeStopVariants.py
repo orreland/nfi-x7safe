@@ -299,3 +299,34 @@ class X7SafeN25NoRebuy(X7SafeStopHonored):
   long_entry_signal_params = _without_rebuy_entries(
     NostalgiaForInfinityX7Safe.long_entry_signal_params, tags=("61", "62", "63", "64", "65")
   )
+
+
+# ---------------------------------------------------------------------------
+# Rebuy hard-stop position grid (pre-registered 2026-10-27, report section 26).
+# Same N25 + E10 base, only rebuy_hard_stop moves. 0.15 (base) and 0.25
+# (X7SafeBothStop25) already ran in section 23.
+# ---------------------------------------------------------------------------
+
+
+class X7SafeRebuyStop10(X7SafeStopHonored):
+  rebuy_hard_stop = 0.10
+
+
+class X7SafeRebuyStop12(X7SafeStopHonored):
+  rebuy_hard_stop = 0.12
+
+
+class X7SafeRebuyStop18(X7SafeStopHonored):
+  rebuy_hard_stop = 0.18
+
+
+class X7SafeRebuyStop20(X7SafeStopHonored):
+  rebuy_hard_stop = 0.20
+
+
+class X7SafeRebuyStop30(X7SafeStopHonored):
+  rebuy_hard_stop = 0.30
+
+
+class X7SafeRebuyStop40(X7SafeStopHonored):
+  rebuy_hard_stop = 0.40

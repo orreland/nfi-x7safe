@@ -1,0 +1,74 @@
+{
+  "//": "U20 universe for reports/V3_ROUND2_2026-10-26.md: top 20 by mean daily quote volume 2025-01.",
+  "max_open_trades": 5,
+  "stake_currency": "USDT",
+  "stake_amount": "unlimited",
+  "tradable_balance_ratio": 0.99,
+  "fiat_display_currency": "USD",
+  "dry_run": true,
+  "dry_run_wallet": 1000,
+  "cancel_open_orders_on_exit": false,
+  "trading_mode": "spot",
+  "margin_mode": "",
+  "unfilledtimeout": {
+    "entry": 10,
+    "exit": 10,
+    "exit_timeout_count": 0,
+    "unit": "minutes"
+  },
+  "entry_pricing": {
+    "price_side": "same",
+    "use_order_book": true,
+    "order_book_top": 1,
+    "price_last_balance": 0.0,
+    "check_depth_of_market": {
+      "enabled": false,
+      "bids_to_ask_delta": 1
+    }
+  },
+  "exit_pricing": {
+    "price_side": "same",
+    "use_order_book": true,
+    "order_book_top": 1
+  },
+  "exchange": {
+    "name": "binance",
+    "key": "",
+    "secret": "",
+    "pair_whitelist": [
+      "BTC/USDT",
+      "ETH/USDT",
+      "SOL/USDT",
+      "XRP/USDT",
+      "DOGE/USDT",
+      "ADA/USDT",
+      "TRX/USDT",
+      "LINK/USDT",
+      "LTC/USDT",
+      "XLM/USDT",
+      "AVAX/USDT",
+      "RUNE/USDT",
+      "SHIB/USDT",
+      "FET/USDT",
+      "NEAR/USDT",
+      "GALA/USDT",
+      "DOT/USDT",
+      "UNI/USDT",
+      "CRV/USDT",
+      "ALGO/USDT"
+    ],
+    "pair_blacklist": [
+      "(BULL|BEAR|UP|DOWN)/.*"
+    ],
+    "ccxt_config": {},
+    "ccxt_async_config": {}
+  },
+  "pairlists": [
+    {
+      "method": "StaticPairList"
+    }
+  ],
+  "internals": {
+    "process_throttle_secs": 5
+  }
+}
