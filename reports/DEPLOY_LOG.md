@@ -48,6 +48,7 @@ install -o nfi -g nfi -m 644 /opt/nfi/user_data/strategies/NostalgiaForInfinityX
     服务内存 791 MB，系统可用 692 MB。
   - **dry-run 新样本从 2026-10-25 07:15:20 UTC 开始**：此后新开的交易适用 N25 + E10，之前的 72 笔（−756.31 USDT）属于旧规则。
   - **还没完成的验证：** 交易所侧止损单是否直接挂在 −25%。要等第一笔非 rebuy 交易成交后，按 #4 第 1~3 点检查。
+    **→ 2026-10-29 已验证通过**（GTC/USDT #74，交易所止损 ×0.750），见下文「监控」一节的追记。
 - **2026-10-25 07:27~07:30 UTC：应急手册演练**（`scripts/deploy/RUNBOOK_EMERGENCY.md` 第 6 节），两个机器人都空仓。
   NFI 与 Combined_V3 各停一次、启动一次；代码没有改动，仍是 #4。NFI 新 PID 1141453（07:28:12 启动），
   Combined_V3 容器重启一次。演练期间没有任何交易，dry-run 新样本的起点仍是 07:15:20。
@@ -97,8 +98,18 @@ install -o nfi -g nfi -m 644 /opt/nfi/user_data/strategies/NostalgiaForInfinityX
 | 凭据 | `/root/.tg_monitor.env`（600，只有 root 可读）：`TG_TOKEN` 由用户自己写入，`TG_CHAT_ID` 由脚本从 getUpdates 自动获取并保存。Claude 没有接触 token |
 | 3 日报 | `tg-monitor-report.timer`：每天 01:00 UTC（北京 09:00）检查，距上次 ≥ 3 天才发。首次 2026-10-25 14:24 手动发送，下次约 10-29 09:00（北京） |
 | 告警 | `tg-monitor-alert.timer`：每 10 分钟检查，只在异常时发，同一条 6 小时内不重复。异常条件：服务停止、心跳 > 10 分钟、新的报错类型（排除每天 00:04 的 asyncio 噪音）、可用内存 < 200 MB、磁盘 > 85%、单笔亏损 > 100 USDT、本期合计亏损 > 2%、N25 普通交易的交易所止损不在 ×0.75 |
-| 状态文件 | `/var/lib/tg_monitor/state.json`（上次报告时间、已发告警） |
+| 状态文件 | `/var/lib/tg_monitor/state.json`（上次报告时间、上次告警检查时间、已发告警） |
 | 停用 | `systemctl disable --now tg-monitor-report.timer tg-monitor-alert.timer` |
+
+| # | 时间（UTC） | 改动 | 脚本 sha256 | 部署前备份 |
+|---|---|---|---|---|
+| M0 | 2026-10-25 14:01 | 启用 | `afca14…` | — |
+| M1 | 2026-10-29 05:36:14 | 修误报和漏报，详见 `reports/TG_MONITOR_ISSUES_2026-10-29.md`：读日志时接上 logrotate 转存的 `.1`（修每天 00:00 UTC 的「心跳找不到」误报）；按规则发生的亏损（如 doom 止损 −8%）改发「ℹ️ 提示」而不是告警；N25 检查改为看新规则下所有普通交易（含已平仓），`HARD-STOP-SET` 连旧日志一起数；websocket 行情报错不再告警；健康图标只看健康项；一次性事件只发一次，去重改用固定标识。**只改监控脚本，机器人没有重启，策略没有改动。** | `90a63a…` | `/opt/nfi/scripts/tg_monitor.py.bak-20261029053614` |
+
+- **2026-10-29：N25 已验证生效。** N25 生效后第一笔普通交易 #74（GTC/USDT，tag 6，10-28 12:40:45 开仓）：
+  `HARD-STOP-SET` 日志在开仓 1 秒后出现；数据库止损价和交易所止损单（#264，只有这一张）都是首仓价 ×**0.750**，
+  说明交易所止损是直接挂在 −25%，不是先挂 −15%。该笔 10-29 00:37:37 被 doom 止损以 −8.08%（−112.21 USDT）平仓，属规则内。
+  对照：rebuy 交易 #73（GTC，tag 62）的交易所止损在 ×0.850。之前 3 日报写「HARD-STOP-SET 0 条」是监控脚本的漏报（M1 已修）。
 
 ## Combined_V3（Docker `combined_v3_dryrun`）
 
