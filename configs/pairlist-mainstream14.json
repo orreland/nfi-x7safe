@@ -1,0 +1,10 @@
+{
+  "exchange": {
+    "name": "binance",
+    "pair_whitelist": [
+      "BTC/USDT", "ETH/USDT", "XRP/USDT", "SOL/USDT", "DOGE/USDT", "ADA/USDT", "TRX/USDT",
+      "LINK/USDT", "AVAX/USDT", "DOT/USDT", "BCH/USDT", "LTC/USDT", "SHIB/USDT", "UNI/USDT"
+    ]
+  },
+  "pairlists": [{"method": "StaticPairList"}]
+}

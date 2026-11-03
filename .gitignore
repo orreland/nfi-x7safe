@@ -31,3 +31,5 @@ configs/*_secret.json
 # Same for the upstream-evaluation copy (reports/UPSTREAM_EVAL_2026-10-26.md):
 # v17.5.185 = iterativv/NostalgiaForInfinity commit 3015bed, NostalgiaForInfinityX7.py.
 /user_data/strategies_up/NostalgiaForInfinityX7.py
+# Community comparison copies (reports/PARITY_COMMUNITY_2026-11-03.md), upstream commit 3f0df18.
+/user_data/strategies_comm/
