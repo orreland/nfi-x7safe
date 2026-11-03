@@ -26,16 +26,12 @@ bash scripts/fetch_upstream.sh
 不用账户和 API key。Binance 的公开接口在某些网络环境下可能要代理。
 
 ```bash
-export PYTHONUTF8=1
-BASE="--user-data-dir=./user_data --config=configs/exampleconfig.json --config=configs/exampleconfig_secret.json --config=configs/trading_mode-spot.json --config=configs/local-overrides-safe.json"
-.venv/Scripts/python.exe scripts/ft_delisted.py download-data $BASE --config=configs/blacklist-binance.json --config=configs/pairlist-backtest-static-binance-spot-usdt.json --timeframes 5m 15m 1h 4h 1d --timerange 20250101-20261104
-.venv/Scripts/python.exe scripts/ft_delisted.py download-data $BASE --config=configs/blacklist-survivorship-test.json --config=configs/pairlist-survivorship-B-real-universe.json --timeframes 5m 15m 1h 4h 1d --timerange 20250101-20261104
-.venv/Scripts/python.exe scripts/fetch_delisted_data.py --start 2025-01 --end 2026-11
+bash scripts/download_data.sh all
 ```
 
-- 已下架币取不到实时接口的数据，`fetch_delisted_data.py` 从 `data.binance.vision` 的月度存档恢复。
+- 已下架币取不到实时接口的数据，脚本会用 `fetch_delisted_data.py` 从 `data.binance.vision` 的月度存档恢复。
 - `reports/baselines/data_manifest.csv` 记录了我们用的每个数据文件的行数、起止时间和 hash。**下载时间不同，文件 hash 和末尾时间会不同，这不一定影响结果**，以第 4 步的逐笔核对为准。
-- 如果只想验证流程，只下载主流币就够了（把币种配置换成 `configs/pairlist-mainstream14.json`），然后跑 `main-*` 基准。
+- 如果只想验证流程，运行 `bash scripts/download_data.sh main`，只下载 14 个主流币，然后跑 `main-*` 基准。
 
 ## 4. 跑基准并核对
 
