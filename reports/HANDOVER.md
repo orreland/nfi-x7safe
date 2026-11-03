@@ -3,6 +3,7 @@
 更新于 2026-10-29。读完本文就能知道：机器人跑在哪、代码在哪、有哪些记录、做过哪些决定、下一步是什么。
 
 **密钥、密码、Token 一律不写在这里。** 下文只写它们放在哪里，要用时由用户本人在终端里操作。
+服务器地址等私人信息用 `<服务器IP>` 这类占位符代替；真实值只在项目负责人本机的 `reports/PRIVATE_NOTES.local.md` 里，不上传。
 
 ---
 
@@ -20,7 +21,7 @@
 |---|---|
 | 语言 | 用**中文**回答，用简单、不带术语的话 |
 | 磁盘 | 文件和缓存放 **D 盘**，C 盘空间不够 |
-| 提交 | **用户说了才 commit**，从不 push |
+| 提交 | **用户说了才 commit 和 push**；公开前必须去掉私人信息 |
 | 改服务器 | 先备份，记入 `reports/DEPLOY_LOG.md`，只在空仓时重启；要经用户同意 |
 | 实验方法 | **先预注册**（开跑前写好假设、实验臂、采纳标准），结果出来后不改标准 |
 | 密钥 | Telegram Token、交易所 API key 不要发给 AI；用户自己写到服务器上 |
@@ -82,23 +83,25 @@
 | 项 | 值 |
 |---|---|
 | 本机路径 | `D:\NostalgiaForInfinity` |
-| 远程仓库 | `https://github.com/orreland/nfi-x7safe.git`（只推送过 master；工作分支**没有推送**） |
-| 当前分支 | `exp/rebuy-ab-parity`，最新提交 `3634e6b`（2026-10-27） |
+| 远程仓库 | `https://github.com/orreland/nfi-x7safe.git`（公开仓库，只放脱敏后的内容） |
+| 当前分支 | `exp/rebuy-ab-parity`，已同步到公开的 master |
 | git 用户 | orreland |
-| 未纳入 git | `dryrun_backups/`、上游 X7 原文件、`nfi_repo/`、行情数据、回测结果、`.venv`、`scratch/` |
+| 未纳入 git | 上游策略原文件、`nfi_repo/`、行情数据、回测结果、`.venv`、`scratch/`、`reports/PRIVATE_NOTES.local.md` |
 
 提交历史（从新到旧）：
 
 ```
-3634e6b Rebuy hard-stop grid, V3 round 2, follow-up plan
-70bcbab Evaluate upstream NFI X7 v17.5.185 under our safety layer
-bcdbb39 Add read-only Telegram monitoring for the dry-run bots
-b61b6c6 Add Combined_V3 exit/concurrency experiment and plain X7 summary
-05c52e3 Rebuy experiments on the N25 + E10 base; runbook drill
-e8c938e Record N25 + E10 going live on the dry-run server
-48cd3a6 Deploy N25 to dry-run; add server deployment log
-41d4c07 Stop-variant experiments, MaxDrawdown equity mode, server sync, runbook
-706e38e Add rebuy A/B and backtest/dry-run parity check
+5b03e24 Add dry-run parity, community comparison and mainstream-coin backtests
+ac558db Fix Telegram monitor false alarms; record N25 verified on dry-run
+879b2f9 Rebuy hard-stop grid, V3 round 2, follow-up plan
+131f70c Evaluate upstream NFI X7 v17.5.185 under our safety layer
+6d57ee3 Add read-only Telegram monitoring for the dry-run bots
+9ec16a1 Add Combined_V3 exit/concurrency experiment and plain X7 summary
+5b7bfa3 Rebuy experiments on the N25 + E10 base; runbook drill
+7d5ae28 Record N25 + E10 going live on the dry-run server
+76c2bae Deploy N25 to dry-run; add server deployment log
+0a50bed Stop-variant experiments, MaxDrawdown equity mode, server sync, runbook
+fbb8b01 Add rebuy A/B and backtest/dry-run parity check
 bc1ccb9 Don't redistribute upstream base class; README already documents clone+cp
 48f0319 Initial commit: X7Safe risk-fixed fork of NostalgiaForInfinityX7
 ```
@@ -136,7 +139,7 @@ bc1ccb9 Don't redistribute upstream base class; README already documents clone+c
 | `scripts/fetch_delisted_data.py` | 下载已下架币的行情 |
 | `pypatches/sitecustomize.py` | 省内存补丁（`FT_LOWMEM=1`），开不开结果逐笔一样 |
 | `scripts/deploy/` | 部署说明 `DEPLOY.md`、**应急手册 `RUNBOOK_EMERGENCY.md`**（10-25 演练过）、`server_setup.sh`、服务模板、Telegram 脚本 |
-| `scratch/tools/` | 各轮实验的队列和评估脚本（不在 git 里，离线备份盘有备份） |
+| `tools/experiments/` | 各轮实验的队列和评估脚本（`scratch/tools/` 的存档） |
 
 ### 5.4 报告（建议按这个顺序读）
 
@@ -157,7 +160,7 @@ bc1ccb9 Don't redistribute upstream base class; README already documents clone+c
 
 | 位置 | 内容 |
 |---|---|
-| `dryrun_backups/` | 从服务器拷下来的数据库快照：X7 截到 10-17，V3 截到 10-25，还有 09-02 的一份。**是旧数据** |
+| `dryrun_backups/` | 从服务器拷下来的数据库快照：X7 截到 10-17 和 11-03，V3 截到 10-25 |
 | `user_data/backtest_results/stopgrid-*`、`v3-*`、`up-*` | 约 250 个回测结果，1.3 GB |
 | `user_data/data/binance/` | 5 分钟 K 线行情数据（feather 格式） |
 | 根目录 `logs_*.log`、`scratch/tmp/log_*.log` | 各次回测的运行日志 |
@@ -170,7 +173,7 @@ bc1ccb9 Don't redistribute upstream base class; README already documents clone+c
 | 离线备份盘 `<离线备份盘>\NFI_backup_20261027\`（最新） | git bundle（全部历史，提交 `3634e6b`）、`files\`（代码和报告的明文副本）、`dryrun_backups\`、`scratch_tools\`、`README_恢复说明.txt` |
 | 离线备份盘 `<离线备份盘>\NFI_backup_20261025\`、`<离线备份盘>\NFI_backup_20261026\` | 更早的两份 |
 | 服务器 | 策略 `.bak-*` 文件；`DEPLOY_LOG.md` 副本 |
-| GitHub | 只有 master，比较旧 |
+| GitHub | 公开仓库，脱敏后的完整历史；改写前的提交号对照见 `docs/HISTORY.md` |
 
 恢复方法：`git clone <离线备份盘>\NFI_backup_20261027\NostalgiaForInfinity.bundle D:\NostalgiaForInfinity -b exp/rebuy-ab-parity`
 

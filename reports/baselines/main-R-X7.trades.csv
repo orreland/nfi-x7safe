@@ -1,0 +1,4 @@
+pair,open_date,close_date,enter_tag,exit_reason,profit_ratio,profit_abs
+BCH/USDT,2026-09-10 13:20:00,2026-09-11 12:55:00,141,exit_long_tc_d_0_119 ( 141 ),0.001063,1.5966
+DOT/USDT,2026-10-08 15:30:00,2026-10-08 16:20:00,141,exit_long_tc_d_0_48 ( 141 ),0.002800,4.2043
+AVAX/USDT,2026-10-08 15:25:00,2026-10-08 18:25:00,6 141,exit_long_normal_d_0_79 ( 6 141 ),0.002496,3.7473

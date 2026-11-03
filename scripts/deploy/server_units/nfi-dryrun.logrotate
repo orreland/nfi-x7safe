@@ -1,0 +1,9 @@
+/opt/nfi/user_data/logs/dryrun.log {
+    daily
+    rotate 120
+    compress
+    delaycompress
+    missingok
+    notifempty
+    copytruncate
+}

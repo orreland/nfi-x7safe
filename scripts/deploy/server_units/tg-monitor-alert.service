@@ -1,0 +1,5 @@
+[Unit]
+Description=Telegram anomaly alerts for the dry-run bots (read-only)
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/nfi/scripts/tg_monitor.py alert

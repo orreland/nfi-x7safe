@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly controlled restart window for nfi-dryrun.service
+
+[Timer]
+OnCalendar=Sun *-*-* 03:17:00 UTC
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

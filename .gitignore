@@ -33,3 +33,10 @@ configs/*_secret.json
 /user_data/strategies_up/NostalgiaForInfinityX7.py
 # Community comparison copies (reports/PARITY_COMMUNITY_2026-11-03.md), upstream commit 3f0df18.
 /user_data/strategies_comm/
+# Private values replaced by placeholders in the public repo.
+/reports/PRIVATE_NOTES.local.md
+# Live sqlite sidecars; the .sqlite snapshots themselves are published.
+/dryrun_backups/*.sqlite-shm
+/dryrun_backups/*.sqlite-wal
+# Old raw snapshot with a full server log; not published.
+/dryrun_backups/2026-09-02/

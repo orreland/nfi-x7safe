@@ -1,0 +1,6 @@
+[Unit]
+Description=Controlled weekly restart of nfi-dryrun.service (skips if a trade is open)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/nfi/scripts/nfi_safe_restart.py
