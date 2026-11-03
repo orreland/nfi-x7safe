@@ -72,6 +72,17 @@ PYTHONUTF8=1 .venv/Scripts/python.exe scripts/compare_parity.py comm-P-OURS --db
 - **配置文件里有中文注释**，Windows 上要设 `PYTHONUTF8=1`。
 - **回测按 K 线开盘价成交，没有滑点。** 模拟盘在开盘后几十秒才成交，价格可能已经变了。
 
+## 验证记录
+
+2026-11-03，在全新克隆、全新虚拟环境（Windows 11 + Python 3.11.9）里按本文操作：
+
+| 数据来源 | 基准 | 结果 |
+|---|---|---|
+| `download_data.sh main` 新下载 | `main-R-OURS`、`main-L-OURS`、`main-L-X8` | 逐笔一致（3、56、48 笔） |
+| 本机已有的完整数据 | `comm-P-OURS`、`comm-L-OURS` | 逐笔一致（7、525 笔） |
+
+**没有验证的：** `download_data.sh all` 的完整下载（已下架币只试了 WING 一个币）、Linux 环境、其他 13 组基准的重跑。
+
 ## 什么情况复现不了
 
 - **模拟盘本身：** 它用当时的实时价格，只能对账，不能完全重跑。快照放在 `dryrun_backups/`。
