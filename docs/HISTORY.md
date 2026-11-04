@@ -14,6 +14,8 @@
 | 2026-10-25~27 | V3 出场和并发实验（不改）；上游 v17.5.185 评估（可以升级，但不急）；rebuy 14 种方案（不改） | `reports/V3_*`、`reports/UPSTREAM_EVAL_2026-10-26.md`、`reports/REBUY_TESTS_DETAIL_2026-10-27.md` |
 | 2026-10-29 | 修 Telegram 监控的误报和漏报；**N25 验证生效**（交易所止损直接挂在首仓价 ×0.75） | `reports/TG_MONITOR_ISSUES_2026-10-29.md` |
 | 2026-11-03 | 对账 6/6 复现，发现开仓价差问题；对比社区 X7 v17.5.206、X8 v18.0.195；主流币测试；仓库脱敏公开 | `reports/PARITY_COMMUNITY_2026-11-03.md`、`reports/MAINSTREAM_TEST_2026-11-03.md` |
+| 2026-11-03 | 开仓价差、X8 + 安全层、长线趋势实验，全部未通过预注册标准 | `reports/EXPERIMENTS_2026-11-03.md` |
+| 2026-11-04 | 用真实 1 分钟行情建开仓模型，测试不追价和更低的限价，4 个方案都未通过 | `reports/ENTRY_POLICY_2026-11-04.md` |
 
 ## 提交号对照
 
