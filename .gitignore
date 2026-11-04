@@ -40,3 +40,5 @@ configs/*_secret.json
 /dryrun_backups/*.sqlite-wal
 # Old raw snapshot with a full server log; not published.
 /dryrun_backups/2026-09-02/
+/user_data/strategies_x8s/NostalgiaForInfinityX8.py
+/user_data/data_long/

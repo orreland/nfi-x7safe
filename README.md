@@ -48,6 +48,8 @@ and [docs/TEAM_HANDOFF.md](docs/TEAM_HANDOFF.md) to continue the work. Documents
 
 **回测和模拟盘对账：** 当前规则下 6/6 笔都复现，但模拟盘亏 291 USDT、回测只亏 142 USDT。差额几乎都来自一笔开仓价差，详见报告。
 
+**要打折看 +129%：** 模拟盘开仓平均比回测贵 0.51%。只把这个价差放进回测，X7Safe 就降到 **+85%、回撤 12.9%**；其中 2025 Q4 一个季度就涨了 65%。X8 + 安全层和长线趋势都没通过预注册标准，见 [实验报告](reports/EXPERIMENTS_2026-11-03.md)。
+
 ## 目录
 
 | 位置 | 内容 |

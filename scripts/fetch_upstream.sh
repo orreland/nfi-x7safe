@@ -18,3 +18,4 @@ get 296b962 NostalgiaForInfinityX7.py user_data/strategies/NostalgiaForInfinityX
 get 3015bed NostalgiaForInfinityX7.py user_data/strategies_up/NostalgiaForInfinityX7.py c8a4f38b69697e4f # v17.5.185, reports/UPSTREAM_EVAL_2026-10-26.md
 get 3f0df18 NostalgiaForInfinityX7.py user_data/strategies_comm/NostalgiaForInfinityX7.py e78c7c5e3226d1b9 # v17.5.206, community comparison
 get 3f0df18 NostalgiaForInfinityX8.py user_data/strategies_comm/NostalgiaForInfinityX8.py a29beba0887ba4ca # v18.0.195, community comparison
+get 3f0df18 NostalgiaForInfinityX8.py user_data/strategies_x8s/NostalgiaForInfinityX8.py a29beba0887ba4ca  # base of X8 + safety layer, reports/EXPERIMENTS_2026-11-03.md
