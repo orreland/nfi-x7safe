@@ -45,7 +45,16 @@ def load(run):
     "under_d": longest, "doom": f"{len(doom)}/{sum(t['profit_abs'] for t in doom):.0f}", "hard": f"{len(hard)}/{sum(t['profit_abs'] for t in hard):.0f}",
     "pairs": f"{m[-1][1]} ranked, {float(m[-1][2]):.1f}/day" if m else "-", "traded": len({t["pair"] for t in tr}),
     "recon": abs(eq.iloc[-1] - stats["final_balance"]) / stats["final_balance"] * 100,
+    **{f"y{y}": _year(eq, y) for y in ("2025", "2026")},
   }
+
+
+def _year(eq, y):
+  e = eq.loc[f"{int(y) - 1}-12-31":f"{y}-12-31"] if y != "2025" else eq.loc[:"2025-12-31"]
+  if len(e) < 3:
+    return (float("nan"), float("nan"), float("nan"))
+  r, d = (e.iloc[-1] / e.iloc[0] - 1) * 100, _dd(e)
+  return (r, d, r / d if d else float("nan"))
 
 
 R = {(a, w): load(f"{r}-{w}") for a, r in RUNS.items() for w in "LR"}
@@ -70,3 +79,17 @@ for a in list(RUNS)[1:]:
   ]
   verdict = "SAMPLE TOO SMALL" if l["n"] < 100 else ("PASS" if all(c[3] for c in checks) else "FAIL")
   print(f"{a:5s}{verdict:17s}" + "  ".join(f"{c[0]} {c[1]:.2f}/{c[2]:.2f} {'ok' if c[3] else 'NO'}" for c in checks))
+
+if "sweep" in sys.argv:
+  print("\nStep 2: yearly ratio vs M (L window)")
+  passed = []
+  for a in list(RUNS)[1:]:
+    l, r = R[a, "L"], R[a, "R"]
+    ratio = l["ret"] / l["dd"]
+    step1 = l["dd"] <= 0.8 * ml["dd"] and ratio >= mratio and l["ret"] >= 0.5 * ml["ret"] and r["ret"] >= mr["ret"] + 2 and l["n"] >= 100
+    yrs = all(l[k][2] >= ml[k][2] for k in ("y2025", "y2026"))
+    print(f"{a:5s} step1={'ok' if step1 else 'NO'} 2025 {l['y2025'][0]:+.1f}/{l['y2025'][1]:.2f}={l['y2025'][2]:.2f} (M {ml['y2025'][2]:.2f})"
+          f"  2026 {l['y2026'][0]:+.1f}/{l['y2026'][1]:.2f}={l['y2026'][2]:.2f} (M {ml['y2026'][2]:.2f})  years={'ok' if yrs else 'NO'}")
+    if step1 and yrs:
+      passed.append((ratio, a))
+  print("candidate:", max(passed)[1] if passed else "none", "| all passing step 1+2:", [a for _, a in sorted(passed, reverse=True)])
