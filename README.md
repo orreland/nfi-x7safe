@@ -52,6 +52,8 @@ and [docs/TEAM_HANDOFF.md](docs/TEAM_HANDOFF.md) to continue the work. Documents
 
 **后续：** 改用每笔的真实 1 分钟行情估算价差后，X7Safe 约为 **+101%、回撤 7.7%**，这只是模型推算。不追价和更低的限价 4 个方案都没通过：买得便宜一点，但错过的好交易更多，见 [开仓方式报告](reports/ENTRY_POLICY_2026-11-04.md)。
 
+**币种范围：** 只在成交额排名前 40 的币里开新仓（V40），20 个月 +76.9%、回撤 3.9%（全部币 +100.8%、7.7%），最近 9 周 −3.3%（全部币 −7.2%），通过了预注册标准，等 12-20 用新数据复验，见 [币种范围报告](reports/UNIVERSE_VOLUME_2026-11-06.md)。门槛扫描见 [reports/UNIVERSE_SWEEP_2026-11-07.md](reports/UNIVERSE_SWEEP_2026-11-07.md)。
+
 ## 目录
 
 | 位置 | 内容 |
