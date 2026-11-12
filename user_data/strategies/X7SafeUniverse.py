@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from X7SafeEntryPolicy import X7SafeEntryChase
+from X7SafeEntryPolicy import RetryMixin, X7SafeEntryChase
 
 log = logging.getLogger(__name__)
 
@@ -86,3 +86,8 @@ class X7SafeVol60(X7SafeVol20):
 
 class X7SafeVol80(X7SafeVol20):
   top_n = 80
+
+
+# reports/ENTRY_RETRY_2026-11-08.md
+class X7SafeVol40Retry(RetryMixin, X7SafeVol40):
+  pass

@@ -1,0 +1,23 @@
+# Third home bot (draft, NOT started). Same image, strategies and configs as n7_x7safe_dryrun,
+# plus configs/pairlist-volume40.json right after the static pair list.
+services:
+  freqtrade:
+    image: freqtradeorg/freqtrade:2026.7
+    container_name: x7safe_v40_home_dryrun
+    restart: unless-stopped
+    volumes:
+      - ./user_data:/freqtrade/user_data
+      - ./configs:/freqtrade/configs:ro
+    command: >
+      trade
+      --config /freqtrade/configs/exampleconfig.json
+      --config /freqtrade/configs/exampleconfig_secret.json
+      --config /freqtrade/configs/trading_mode-spot.json
+      --config /freqtrade/configs/blacklist-binance.json
+      --config /freqtrade/configs/pairlist-backtest-static-binance-spot-usdt.json
+      --config /freqtrade/configs/pairlist-volume40.json
+      --config /freqtrade/configs/local-overrides-safe.json
+      --config /freqtrade/configs/local-overrides-dryrun.json
+      --config /freqtrade/configs/homeserver-x7safe-v40.json
+      --strategy NostalgiaForInfinityX7Safe --strategy-path /freqtrade/user_data/strategies
+      --logfile /freqtrade/user_data/logs/x7safe-v40-home.log

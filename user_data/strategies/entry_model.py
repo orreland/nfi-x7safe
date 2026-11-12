@@ -62,8 +62,8 @@ def _load_month(symbol: str, month: str) -> pd.DataFrame:
   return df
 
 
-def minutes(pair: str, when: datetime):
-  """The candle's first TIMEOUT_MINUTES + 1 one-minute bars, or None if unavailable."""
+def minutes(pair: str, when: datetime, n: int = TIMEOUT_MINUTES + 1):
+  """The candle's first n one-minute bars (default TIMEOUT_MINUTES + 1), or None if unavailable."""
   symbol = pair.split(":")[0].replace("/", "")
   month = f"{when:%Y-%m}"
   key = (symbol, month)
@@ -76,7 +76,7 @@ def minutes(pair: str, when: datetime):
   if df is None:
     return None
   t0 = int(when.timestamp() * 1000)
-  bars = df.reindex([t0 + 60000 * i for i in range(TIMEOUT_MINUTES + 1)])
+  bars = df.reindex([t0 + 60000 * i for i in range(n)])
   return None if np.isnan(bars["o"].iloc[0]) else bars
 
 
@@ -104,3 +104,25 @@ def decide(pair: str, when: datetime, limit_offset):
     return market
   rest = bars.iloc[1:]["l"].dropna()
   return limit if (rest < limit).any() else None
+
+
+def decide_retry(pair: str, when: datetime, guard_ref: float, max_slippage: float = 0.02):
+  """Chase the market, retrying inside the 5m candle when X7's slippage guard would refuse.
+
+  reports/ENTRY_RETRY_2026-11-08.md. The live bot loops every 5 s and asks again while the
+  signal stands; here the retries are the closes of minutes 0..4. Returns (price, status) with
+  status "first", "retried" or "refused" (the guard then refuses the returned market price),
+  or ("nodata", "nodata").
+  """
+  bars = minutes(pair, when, 5)
+  if bars is None:
+    return "nodata", "nodata"
+  limit = guard_ref * (1.0 + max_slippage)
+  market = market_at_order(bars) * (1.0 + CALIBRATION)
+  if market < limit:
+    return market, "first"
+  for c in bars["c"].dropna():
+    p = float(c) * (1.0 + CALIBRATION)
+    if p < limit:
+      return p, "retried"
+  return market, "refused"

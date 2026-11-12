@@ -1,0 +1,12 @@
+{
+  // Third home-server bot: the X7Safe copy, but new trades only in the top-40 volume coins (V40).
+  // Loaded LAST. Only its name and database differ from homeserver-x7safe.json; no web API, no Telegram.
+  // Purpose: measure seconds per 5-min candle with 40 coins vs the 101-coin copy on the same PC.
+  // reports/PLAN_V40_SPEEDUP_2026-11-10.md section 3 item 3. Dry run only, no keys.
+  "bot_name": "X7Safe-V40-homeserver-test",
+  "dry_run": true,
+  "dry_run_wallet": 10000,
+  "db_url": "sqlite:///user_data/tradesv3.x7safe-v40-home.sqlite",
+  "telegram": {"enabled": false, "token": "", "chat_id": ""},
+  "api_server": {"enabled": false}
+}

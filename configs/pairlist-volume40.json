@@ -1,0 +1,29 @@
+{
+  // V40: open new trades only in the 40 coins with the highest 30-day USDT volume.
+  // Plan: reports/PLAN_V40_SPEEDUP_2026-11-10.md. NOT deployed; needs the 12-20 re-test and user consent.
+  //
+  // Load it right AFTER pairlist-backtest-static-binance-spot-usdt.json. It replaces that file's
+  // "pairlists" (freqtrade replaces lists, it does not merge them), so StaticPairList is repeated here
+  // and pair_whitelist still comes from the static file. Remove this file + restart to roll back.
+  //
+  // Live behaviour (checked in freqtrade 2026.7 VolumePairList.py / freqtradebot.py):
+  // - As a filter it re-ranks on every loop, but the 1d candles are cached until the UTC day closes
+  //   and the unfinished day is dropped, so the list changes once a day at 00:00 UTC, using the
+  //   30 finished days before today - the same window as X7SafeUniverse.allowed_table in backtests.
+  // - refresh_period must be >= 1 day when lookback_days is set (freqtrade refuses less).
+  // - Coins with open trades stay analysed until sold (freqtradebot extends the whitelist with them),
+  //   so only NEW trades are limited; adds, rebuys and exits are untouched.
+  // - Difference from the backtest: freqtrade ranks by volume x (high+low+close)/3, the backtest by
+  //   volume x close. tools/v40_list_check.py measures how many coins this changes.
+  "pairlists": [
+    { "method": "StaticPairList" },
+    {
+      "method": "VolumePairList",
+      "number_assets": 40,
+      "sort_key": "quoteVolume",
+      "min_value": 0,
+      "lookback_days": 30,
+      "refresh_period": 86400
+    }
+  ]
+}

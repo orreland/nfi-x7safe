@@ -43,3 +43,6 @@ configs/*_secret.json
 /user_data/strategies_x8s/NostalgiaForInfinityX8.py
 /user_data/data_long/
 /user_data/data_1m/
+/user_data/data_funding/
+/user_data/tradesv3.t1-dryrun.sqlite*
+/user_data/data_t3/
